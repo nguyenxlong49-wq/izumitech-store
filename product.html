@@ -3,36 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chi tiáº¿t sáº£n pháº©m â€” IzumiTech</title>
+  <title>Chi tiết sản phẩm — IzumiTech</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header class="header">
     <div class="container header-inner">
       <a href="index.html" class="logo">
-        <span class="logo-icon">âš¡</span>
+        <span class="logo-icon">⚡</span>
         <div class="logo-col">
           <span class="logo-text">Izumi<span>Tech</span></span>
-          <small class="slogan">CÃ´ng nghá»‡ xá»‹n â€” GiÃ¡ cá»±c yÃªu</small>
+          <small class="slogan">Công nghệ xịn — Giá cực yêu</small>
         </div>
       </a>
       <div class="header-actions" style="margin-left:auto">
-        <a href="tel:19006868" class="hotline"><span class="hotline-icon">ðŸ“ž</span><span class="hotline-text"><small>Hotline 24/7</small><b>1900 6868</b></span></a>
-        <a href="index.html" class="auth-btn">â† Vá» cá»­a hÃ ng</a>
-        <button class="cart-btn" id="cartBtn">ðŸ›’<span class="cart-count" id="cartCount">0</span></button>
+        <a href="tel:19006868" class="hotline"><span class="hotline-icon">📞</span><span class="hotline-text"><small>Hotline 24/7</small><b>1900 6868</b></span></a>
+        <a href="index.html" class="auth-btn">← Về cửa hàng</a>
+        <button class="cart-btn" id="cartBtn">🛒<span class="cart-count" id="cartCount">0</span></button>
       </div>
     </div>
   </header>
 
   <main class="container" id="productRoot">
-    <p class="muted" style="padding:20px 0">Äang táº£i sáº£n pháº©m...</p>
+    <p class="muted" style="padding:20px 0">Đang tải sản phẩm...</p>
   </main>
 
   <div class="toast" id="toast"></div>
   <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
-    <div class="cart-head"><h3>ðŸ›’ Giá» hÃ ng</h3><button class="icon-btn" id="closeCart">âœ•</button></div>
+    <div class="cart-head"><h3>🛒 Giỏ hàng</h3><button class="icon-btn" id="closeCart">✕</button></div>
     <div class="cart-items" id="cartItems"></div>
-    <div class="cart-foot"><div class="cart-total-row"><span>Táº¡m tÃ­nh</span><b id="cartTotal">0â‚«</b></div><button class="btn btn-primary btn-block" id="checkoutBtn">Thanh toÃ¡n</button></div>
+    <div class="cart-foot"><div class="cart-total-row"><span>Tạm tính</span><b id="cartTotal">0₫</b></div><button class="btn btn-primary btn-block" id="checkoutBtn">Thanh toán</button></div>
   </aside>
   <div class="overlay" id="overlay"></div>
 
@@ -40,12 +40,9 @@
   <script>
     const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://localhost:5000":"https://izumitech-api.onrender.com";
     const $=s=>document.querySelector(s);
-    const vnd=n=> new Intl.NumberFormat("vi-VN").format(n)+"â‚«";
+    const vnd=n=> new Intl.NumberFormat("vi-VN").format(n)+"₫";
     const params=new URLSearchParams(location.search);
     const id=params.get("id");
-
-    // DEFAULT_PRODUCTS now from js/products.js â€” single source of truth
-    const _DEFAULT_FALLBACK = typeof DEFAULT_PRODUCTS !== "undefined" ? DEFAULT_PRODUCTS : [];
 
     let product=null;
     let allProducts=[];
@@ -53,27 +50,27 @@
     async function load(){
       try{
         const local = JSON.parse(localStorage.getItem("izumitech-products")||"null");
-        allProducts = local && local.length ? local : DEFAULT_PRODUCTS;
-      }catch{ allProducts=DEFAULT_PRODUCTS; }
+        allProducts = local && local.length ? local : (typeof DEFAULT_PRODUCTS !== "undefined" ? DEFAULT_PRODUCTS : []);
+      }catch{ allProducts=(typeof DEFAULT_PRODUCTS !== "undefined" ? DEFAULT_PRODUCTS : []); }
       try{
         const r=await fetch(`${API}/api/products`);
         if(r.ok){ const d=await r.json(); if(Array.isArray(d)&&d.length) allProducts=d.map(p=>({...p,id:p._id||p.id})); }
       }catch{}
       product = allProducts.find(p=>String(p.id)===String(id));
-      if(!product) { $("#productRoot").innerHTML=`<p style="padding:40px 0;text-align:center">KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m ðŸ˜¢<br><a href="index.html" class="btn btn-primary" style="margin-top:12px">Vá» trang chá»§</a></p>`; return; }
+      if(!product) { $("#productRoot").innerHTML=`<p style="padding:40px 0;text-align:center">Không tìm thấy sản phẩm 😢<br><a href="index.html" class="btn btn-primary" style="margin-top:12px">Về trang chủ</a></p>`; return; }
       render();
       renderRelated();
       renderComments();
       updateCartUI();
     }
 
-    function stars(n){ return "â˜…".repeat(Math.round(n))+"â˜†".repeat(5-Math.round(n)); }
+    function stars(n){ return "★".repeat(Math.round(n))+"☆".repeat(5-Math.round(n)); }
 
     function render(){
       const p=product;
       const disc = p.oldPrice ? Math.round((1-p.price/p.oldPrice)*100) : 0;
-      const stockText = p.stock===0 ? `<span style="color:var(--danger);font-weight:700">â— Háº¿t hÃ ng</span>` : (p.stock<5 ? `<span style="color:var(--warning);font-weight:700">â— Sáº¯p háº¿t (cÃ²n ${p.stock})</span>` : `<span style="color:var(--accent)">â— CÃ²n hÃ ng (${p.stock})</span>`);
-      document.title = `${p.name} â€” IzumiTech`;
+      const stockText = p.stock===0 ? `<span style="color:var(--danger);font-weight:700">● Hết hàng</span>` : (p.stock<5 ? `<span style="color:var(--warning);font-weight:700">● Sắp hết (còn ${p.stock})</span>` : `<span style="color:var(--accent)">● Còn hàng (${p.stock})</span>`);
+      document.title = `${p.name} — IzumiTech`;
       $("#productRoot").innerHTML=`
         <div class="product-page">
           <div class="product-gallery">
@@ -85,39 +82,39 @@
           <div class="product-info">
             <span style="color:var(--accent);font-weight:700;font-size:0.82rem;text-transform:uppercase">${p.category}</span>
             <h1>${p.name}</h1>
-            <div class="product-meta"><span class="stars">${stars(p.rating)}</span><span>${p.rating}</span><small>Â· ÄÃ£ bÃ¡n ${p.sold.toLocaleString("vi-VN")} Â· ${stockText}</small></div>
+            <div class="product-meta"><span class="stars">${stars(p.rating)}</span><span>${p.rating}</span><small>· Đã bán ${p.sold.toLocaleString("vi-VN")} · ${stockText}</small></div>
             <div class="product-price-box">
               <div><span class="price">${vnd(p.price)}</span> ${p.oldPrice?`<span class="price-old" style="margin-left:8px">${vnd(p.oldPrice)}</span>`:""}</div>
-              <small class="muted">GiÃ¡ Ä‘Ã£ bao gá»“m VAT â€¢ Báº£o hÃ nh 12 thÃ¡ng â€¢ Tráº£ gÃ³p 0%</small>
+              <small class="muted">Giá đã bao gồm VAT • Bảo hành 12 tháng • Trả góp 0%</small>
               <div class="product-actions">
                 <button class="btn btn-primary" id="buyNow" ${p.stock===0?'disabled style="opacity:0.5"':''}>Mua ngay</button>
-                <button class="btn btn-ghost" id="buyInstall">Mua tráº£ gÃ³p 0%</button>
-                <button class="btn btn-ghost" id="addCartBtn" ${p.stock===0?'disabled':''}>ï¼‹ ThÃªm vÃ o giá»</button>
+                <button class="btn btn-ghost" id="buyInstall">Mua trả góp 0%</button>
+                <button class="btn btn-ghost" id="addCartBtn" ${p.stock===0?'disabled':''}>＋ Thêm vào giỏ</button>
               </div>
             </div>
             <div class="specs-box">
-              <h3>âš™ï¸ ThÃ´ng sá»‘ ká»¹ thuáº­t</h3>
+              <h3>⚙️ Thông số kỹ thuật</h3>
               <table class="specs-table">
-                ${Object.entries(p.specs||{}).map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">ChÆ°a cÃ³ thÃ´ng sá»‘ chi tiáº¿t</td></tr>`}
+                ${Object.entries(p.specs||{}).map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join("") || `<tr><td colspan="2" class="muted">Chưa có thông số chi tiết</td></tr>`}
               </table>
             </div>
             <ul class="product-desc">
-              <li>Báº£o hÃ nh chÃ­nh hÃ£ng 12 thÃ¡ng, 1 Ä‘á»•i 1 trong 30 ngÃ y náº¿u lá»—i</li>
-              <li>Giao nhanh 2h ná»™i thÃ nh HN/HCM, free ship Ä‘Æ¡n tá»« 500K</li>
-              <li>Tráº£ gÃ³p 0% qua tháº» tÃ­n dá»¥ng hoáº·c duyá»‡t online chá»‰ cáº§n CCCD</li>
-              <li>Táº·ng kÃ¨m dÃ¡n mÃ n hÃ¬nh / vá»‡ sinh miá»…n phÃ­ trá»n Ä‘á»i mÃ¡y</li>
+              <li>Bảo hành chính hãng 12 tháng, 1 đổi 1 trong 30 ngày nếu lỗi</li>
+              <li>Giao nhanh 2h nội thành HN/HCM, free ship đơn từ 500K</li>
+              <li>Trả góp 0% qua thẻ tín dụng hoặc duyệt online chỉ cần CCCD</li>
+              <li>Tặng kèm dán màn hình / vệ sinh miễn phí trọn đời máy</li>
             </ul>
           </div>
         </div>
         <div class="comments">
-          <h3>ðŸ’¬ ÄÃ¡nh giÃ¡ & bÃ¬nh luáº­n</h3>
+          <h3>💬 Đánh giá & bình luận</h3>
           <div class="comment-form">
             <div style="display:flex;gap:10px">
-              <input type="text" id="cName" placeholder="TÃªn cá»§a báº¡n" style="flex:1" />
-              <select id="cRating"><option value="5">â˜…â˜…â˜…â˜…â˜… (5)</option><option value="4">â˜…â˜…â˜…â˜…â˜† (4)</option><option value="3">â˜…â˜…â˜…â˜†â˜† (3)</option><option value="2">â˜…â˜…â˜†â˜†â˜† (2)</option><option value="1">â˜…â˜†â˜†â˜†â˜† (1)</option></select>
+              <input type="text" id="cName" placeholder="Tên của bạn" style="flex:1" />
+              <select id="cRating"><option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option><option value="1">★☆☆☆☆ (1)</option></select>
             </div>
-            <textarea id="cText" rows="3" placeholder="Chia sáº» cáº£m nháº­n cá»§a báº¡n vá» sáº£n pháº©m..."></textarea>
-            <button class="btn btn-primary" id="cSubmit">Gá»­i Ä‘Ã¡nh giÃ¡</button>
+            <textarea id="cText" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+            <button class="btn btn-primary" id="cSubmit">Gửi đánh giá</button>
           </div>
           <div class="comment-list" id="cList"></div>
         </div>
@@ -126,13 +123,13 @@
       $("#buyNow").addEventListener("click", ()=> doBuy(true));
       $("#addCartBtn").addEventListener("click", ()=> doBuy(false));
       $("#buyInstall").addEventListener("click", ()=>{
-        toast("Tráº£ gÃ³p 0%: tráº£ trÆ°á»›c 30%, cÃ²n láº¡i chia 6-12 thÃ¡ng. Gá»i 1900 6868 Ä‘á»ƒ duyá»‡t há»“ sÆ¡ 5 phÃºt ðŸ’³");
+        toast("Trả góp 0%: trả trước 30%, còn lại chia 6-12 tháng. Gọi 1900 6868 để duyệt hồ sơ 5 phút 💳");
       });
       $("#cSubmit").addEventListener("click", submitComment);
     }
 
     function doBuy(isNow){
-      if(product.stock===0){ toast("Sáº£n pháº©m Ä‘Ã£ háº¿t hÃ ng ðŸ˜¢"); return; }
+      if(product.stock===0){ toast("Sản phẩm đã hết hàng 😢"); return; }
       if(isNow){
         location.href=`checkout.html?id=${product.id}&qty=1`;
         return;
@@ -142,7 +139,7 @@
       cart[key]= cart[key] ? {qty:cart[key].qty+1} : {qty:1};
       localStorage.setItem("izumitech-cart",JSON.stringify(cart));
       updateCartUI();
-      toast(`ÄÃ£ thÃªm "${product.name}" vÃ o giá» ðŸ›’`);
+      toast(`Đã thêm "${product.name}" vào giỏ 🛒`);
     }
 
     function getComments(){
@@ -151,7 +148,7 @@
     function renderComments(){
       const list=getComments();
       const box=$("#cList");
-      if(!list.length){ box.innerHTML=`<p class="muted">ChÆ°a cÃ³ bÃ¬nh luáº­n nÃ o â€” hÃ£y lÃ  ngÆ°á»i Ä‘áº§u tiÃªn! âœ¨</p>`; return; }
+      if(!list.length){ box.innerHTML=`<p class="muted">Chưa có bình luận nào — hãy là người đầu tiên! ✨</p>`; return; }
       box.innerHTML=list.map(c=>`
         <div class="comment-item">
           <div class="c-head"><span class="c-avatar">${(c.name?.trim()||"K")[0].toUpperCase()}</span><div><b>${c.name||"Khách"}</b><div class="c-stars">${stars(c.rating)} · ${new Date(c.date).toLocaleDateString("vi-VN")}</div></div></div>
@@ -159,29 +156,28 @@
         </div>`).join("");
     }
     function submitComment(){
-      const name=$("#cName").value.trim() || "KhÃ¡ch";
+      const name=$("#cName").value.trim() || "Khách";
       const rating=Number($("#cRating").value);
       const text=$("#cText").value.trim();
-      if(!text){ toast("Vui lÃ²ng nháº­p ná»™i dung bÃ¬nh luáº­n"); return; }
+      if(!text){ toast("Vui lòng nhập nội dung bình luận"); return; }
       const list=getComments();
       list.unshift({name,rating,text,date:new Date().toISOString()});
       localStorage.setItem(`izumitech-comments-${id}`,JSON.stringify(list));
       $("#cText").value="";
       renderComments();
-      toast("Cáº£m Æ¡n Ä‘Ã¡nh giÃ¡ cá»§a báº¡n! ðŸ’™");
+      toast("Cảm ơn đánh giá của bạn! 💙");
     }
 
     function renderRelated(){
       const rel = allProducts.filter(p=>p.category===product.category && String(p.id)!==String(product.id)).slice(0,4);
       if(!rel.length) return;
-      $("#related").innerHTML=`<h3>ðŸ”— Sáº£n pháº©m liÃªn quan</h3><div class="product-grid">${rel.map(p=>`
+      $("#related").innerHTML=`<h3>🔗 Sản phẩm liên quan</h3><div class="product-grid">${rel.map(p=>`
         <article class="card" onclick="location.href='product.html?id=${p.id}'" style="cursor:pointer">
           <div class="card-media" style="background:linear-gradient(145deg, ${p.color}, var(--surface));overflow:hidden">${p.image?`<img src="${p.image}" style="width:100%;height:100%;object-fit:cover"/>`:p.icon}</div>
           <div class="card-body"><span class="card-cat">${p.category}</span><h3 class="card-title">${p.name}</h3><div class="card-price-row"><span class="price">${vnd(p.price)}</span></div></div>
         </article>`).join("")}</div>`;
     }
 
-    // cart drawer logic
     function updateCartUI(){
       const cart=JSON.parse(localStorage.getItem("izumitech-cart")||"{}");
       const count=Object.values(cart).reduce((s,q)=>s+(q.qty||0),0);
@@ -194,11 +190,11 @@
       const box=$("#cartItems");
       if(!box) return;
       const entries=Object.entries(cart);
-      if(!entries.length){ box.innerHTML=`<p class="cart-empty">Giá» hÃ ng trá»‘ng ðŸ˜´</p>`; return; }
+      if(!entries.length){ box.innerHTML=`<p class="cart-empty">Giỏ hàng trống 😴</p>`; return; }
       box.innerHTML=entries.map(([pid,q])=>{
         const p=allProducts.find(x=>String(x.id)===String(pid));
         if(!p) return "";
-        return `<div class="cart-item"><div class="ci-thumb" style="background:${p.color}">${p.icon}</div><div class="ci-info"><p class="ci-name">${p.name}</p><p class="ci-price">${vnd(p.price)} Ã— ${q.qty}</p></div></div>`;
+        return `<div class="cart-item"><div class="ci-thumb" style="background:${p.color}">${p.icon}</div><div class="ci-info"><p class="ci-name">${p.name}</p><p class="ci-price">${vnd(p.price)} × ${q.qty}</p></div></div>`;
       }).join("");
     }
     let tt;
@@ -208,7 +204,7 @@
     $("#overlay")?.addEventListener("click",()=>$("#cartDrawer").classList.remove("open"));
     $("#checkoutBtn")?.addEventListener("click",()=>{
       const cart=JSON.parse(localStorage.getItem("izumitech-cart")||"{}");
-      if(!Object.keys(cart).length){ toast("Giá» hÃ ng trá»‘ng ðŸ™‚"); return; }
+      if(!Object.keys(cart).length){ toast("Giỏ hàng trống 🙂"); return; }
       location.href="checkout.html";
     });
 
