@@ -367,7 +367,7 @@
       }catch{}
       const u = JSON.parse(localStorage.getItem("izumitech-user")||"null");
       if(!u){ $("#usersBox").innerHTML='<p class="admin-empty">Chưa có khách hàng đăng nhập trên trình duyệt này</p>'; return; }
-      $("#usersBox").innerHTML=`<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)"><span style="width:44px;height:44px;border-radius:50%;background:var(--primary);display:grid;place-items:center;color:#fff;font-weight:800">${u.name[0].toUpperCase()}</span><div><b>${u.name}</b><br><small style="color:var(--muted)">${u.email}</small></div></div>`;
+      $("#usersBox").innerHTML=`<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)"><span style="width:44px;height:44px;border-radius:50%;background:var(--primary);display:grid;place-items:center;color:#fff;font-weight:800">${(u.name?.trim()||"K")[0].toUpperCase()}</span><div><b>${u.name||"Khách"}</b><br><small style="color:var(--muted)">${u.email}</small></div></div>`;
     }
     $("#btnReset").addEventListener("click", async ()=>{
       if(!confirm("Khôi phục 18 sản phẩm mặc định? Dữ liệu chỉnh sửa sẽ mất.")) return;

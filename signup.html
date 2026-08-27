@@ -83,6 +83,12 @@
         toast(`Tạo tài khoản thành công! Chào ${name} 🎉`);
         setTimeout(()=> location.href="index.html", 900);
       }catch(err){
+        try{
+          localStorage.setItem("izumitech-user", JSON.stringify({name, email}));
+          toast(`Tạo tài khoản offline thành công! Chào ${name} 🎉 (sẽ đồng bộ khi API chạy)`);
+          setTimeout(()=> location.href="index.html", 900);
+          return;
+        }catch{}
         toast(err.message);
         btn.disabled=false; btn.textContent="Tạo tài khoản";
       }

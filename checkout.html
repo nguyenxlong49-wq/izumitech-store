@@ -89,6 +89,7 @@
     #checkoutForm input:focus{border-color:var(--primary)}
   </style>
 
+  <script src="js/products.js"></script>
   <script>
     const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://localhost:5000":"https://izumitech-api.onrender.com";
     const $=s=>document.querySelector(s);
@@ -100,12 +101,7 @@
     const singleQty=Number(params.get("qty")||1);
 
     let products=[];
-    const DEFAULT=[
-      {id:1,name:"iPhone 15 Pro Max 256GB",price:29990000,icon:"📱",color:"#3b4a6b"},
-      {id:2,name:"Samsung Galaxy S24 Ultra 512GB",price:27490000,icon:"📱",color:"#5a3b6b"},
-      {id:3,name:"Xiaomi 14T Pro 5G 12GB/512GB",price:14990000,icon:"📱",color:"#2f5545"},
-      {id:16,name:"AirPods Pro 2 (USB-C)",price:5390000,icon:"🎧",color:"#374151"}
-    ];
+    const DEFAULT = (typeof DEFAULT_PRODUCTS !== "undefined" ? DEFAULT_PRODUCTS : []);
 
     async function loadProducts(){
       try{
