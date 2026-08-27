@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng nhập — IzumiTech</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⚡</span>
+        <div class="logo-col">
+          <span class="logo-text">Izumi<span>Tech</span></span>
+          <small class="slogan">Công nghệ xịn — Giá cực yêu</small>
+        </div>
+      </a>
+      <div class="header-actions" style="margin-left:auto">
+        <a href="tel:19006868" class="hotline">
+          <span class="hotline-icon">📞</span>
+          <span class="hotline-text"><small>Hotline 24/7</small><b>1900 6868</b></span>
+        </a>
+        <a href="login.html" class="auth-btn primary">Đăng nhập</a>
+        <a href="signup.html" class="auth-btn">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-page container">
+    <div class="auth-card">
+      <div class="auth-card-top">
+        <h1>Chào mừng trở lại 👋</h1>
+        <p>Đăng nhập để xem đơn hàng và nhận ưu đãi riêng</p>
+      </div>
+      <form id="loginForm">
+        <div>
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required />
+        </div>
+        <div>
+          <label for="loginPass">Mật khẩu</label>
+          <input type="password" id="loginPass" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+      </form>
+      <div class="auth-divider">hoặc</div>
+      <p class="auth-switch">Chưa có tài khoản? <a href="signup.html">Đăng ký ngay</a></p>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script>
+    const API="http://localhost:5000";
+    const $ = s => document.querySelector(s);
+    let t;
+    function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("show"); clearTimeout(t); t=setTimeout(()=>el.classList.remove("show"),2200); }
+    $("#loginForm").addEventListener("submit", async e=>{
+      e.preventDefault();
+      const email=$("#loginEmail").value.trim();
+      const pass=$("#loginPass").value.trim();
+      if(!email||!pass) return;
+      const btn = e.target.querySelector("button[type=submit]");
+      btn.disabled=true; btn.textContent="Đang đăng nhập...";
+      try{
+        const res = await fetch(`${API}/api/auth/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass})});
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.msg||"Đăng nhập thất bại");
+        localStorage.setItem("izumitech-user", JSON.stringify(data.user));
+        localStorage.setItem("izumitech-token", data.token);
+        toast(`Chào mừng trở lại, ${data.user.name}! 💙`);
+        setTimeout(()=> location.href="index.html", 900);
+      }catch(err){
+        const saved = JSON.parse(localStorage.getItem("izumitech-user")||"null");
+        if(saved && saved.email===email){
+          toast(`Chào mừng trở lại, ${saved.name}! 💙 (offline)`);
+          setTimeout(()=> location.href="index.html", 900);
+        } else {
+          toast(err.message + " — thử lại hoặc dùng offline");
+          btn.disabled=false; btn.textContent="Đăng nhập";
+        }
+      }
+    });
+  </script>
+</body>
+</html>

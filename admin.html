@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — IzumiTech</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⚡</span>
+        <div class="logo-col">
+          <span class="logo-text">Izumi<span>Tech</span></span>
+          <small class="slogan">Admin Panel</small>
+        </div>
+      </a>
+      <div class="header-actions" style="margin-left:auto">
+        <a href="index.html" class="auth-btn">← Về cửa hàng</a>
+        <a href="tel:19006868" class="hotline"><span class="hotline-icon">📞</span><span class="hotline-text"><small>Hotline</small><b>1900 6868</b></span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-wrap">
+    <aside class="admin-sidebar">
+      <h2>Quản lý</h2>
+      <button class="admin-nav-btn active" data-tab="products">📦 Sản phẩm</button>
+      <button class="admin-nav-btn" data-tab="orders">🧾 Đơn hàng</button>
+      <button class="admin-nav-btn" data-tab="users">👥 Khách hàng</button>
+      <button class="admin-nav-btn" data-tab="settings">⚙️ Cài đặt</button>
+      <h2>Hành động</h2>
+      <button class="admin-nav-btn" id="btnReset">↩️ Khôi phục mặc định</button>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-stats" id="stats"></div>
+
+      <div id="tab-products">
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <h3>📦 Danh sách sản phẩm</h3>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" id="adSearch" placeholder="Tìm tên sản phẩm..." style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);outline:none" />
+              <button class="btn btn-primary" id="btnAdd" style="padding:8px 16px">＋ Thêm</button>
+            </div>
+          </div>
+
+          <form class="admin-form hidden" id="adForm">
+            <input type="hidden" id="fId" />
+            <label>Tên sản phẩm<input type="text" id="fName" required placeholder="VD: iPhone 15..." /></label>
+            <label>Danh mục
+              <select id="fCat">
+                <option value="phone">📱 Điện thoại</option>
+                <option value="laptop">💻 Laptop</option>
+                <option value="tablet">📲 Tablet</option>
+                <option value="pc">🖥️ PC</option>
+                <option value="gear">🎮 Gear</option>
+                <option value="accessory">🎧 Phụ kiện</option>
+              </select>
+            </label>
+            <label>Giá (VND)<input type="number" id="fPrice" required /></label>
+            <label>Giá cũ (VND, để trống nếu không có)<input type="number" id="fOldPrice" /></label>
+            <label>Đánh giá (1-5)<input type="number" step="0.1" min="1" max="5" id="fRating" required /></label>
+            <label>Đã bán<input type="number" id="fSold" required /></label>
+            <label>Tồn kho<input type="number" id="fStock" required min="0" /></label>
+            <label>Icon (emoji)<input type="text" id="fIcon" placeholder="📱" maxlength="2" /></label>
+            <label>Màu nền (hex)<input type="text" id="fColor" placeholder="#3b4a6b" /></label>
+            <label class="full">Hình ảnh sản phẩm
+              <input type="file" id="fImage" accept="image/*" />
+              <input type="text" id="fImageUrl" placeholder="Hoặc dán URL hình ảnh..." style="margin-top:6px" />
+              <img id="fPreview" alt="preview" style="margin-top:8px;max-width:140px;max-height:100px;border-radius:10px;border:1px solid var(--border);display:none;object-fit:cover" />
+            </label>
+            <label class="full">Thông số kỹ thuật (JSON)
+              <textarea id="fSpecs" rows="4" placeholder='{"Chip":"A17 Pro","RAM":"8GB","Pin":"4422mAh"}' style="padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);outline:none;font-size:0.84rem;resize:vertical"></textarea>
+            </label>
+            <div class="full" style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+              <button type="button" class="auth-btn" id="btnCancel">Hủy</button>
+              <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+            </div>
+          </form>
+
+          <div class="stock-filter" id="stockFilter">
+            <button data-stock="all" class="active">Tất cả</button>
+            <button data-stock="in">Còn hàng</button>
+            <button data-stock="low">Sắp hết (&lt;5)</button>
+            <button data-stock="out">Hết hàng</button>
+          </div>
+          <div id="bestChart" class="chart-wrap"></div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr><th>#</th><th>Tên</th><th>Danh mục</th><th>Giá</th><th>Kho</th><th>Đã bán</th><th>Đánh giá</th><th>Hành động</th></tr>
+              </thead>
+              <tbody id="adTbody"></tbody>
+            </table>
+            <p class="admin-empty hidden" id="adEmpty">Không có sản phẩm nào</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-orders" class="hidden">
+        <div class="admin-card">
+          <h3>🧾 Đơn hàng (demo từ giỏ hàng local)</h3>
+          <p class="muted">Đơn hàng hiện lưu ở localStorage của từng trình duyệt. Đây là bản demo.</p>
+          <div id="ordersBox" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div id="tab-users" class="hidden">
+        <div class="admin-card">
+          <h3>👥 Khách hàng</h3>
+          <div id="usersBox" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div id="tab-settings" class="hidden">
+        <div class="admin-card">
+          <h3>⚙️ Cài đặt</h3>
+          <p class="muted">Cửa hàng: IzumiTech — Slogan: Công nghệ xịn — Giá cực yêu — Hotline: 1900 6868</p>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="localStorage.clear(); location.reload();">Xóa toàn bộ dữ liệu local</button>
+            <a href="index.html" class="btn btn-primary">Ra trang chủ</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const CATS = {phone:"Điện thoại",laptop:"Laptop",tablet:"Tablet",pc:"PC",gear:"Gear",accessory:"Phụ kiện"};
+    const DEFAULT_PRODUCTS = [
+      { id: 1, name: "iPhone 15 Pro Max 256GB", category: "phone", price: 29990000, oldPrice: 34990000, rating: 4.9, sold: 1200, icon: "📱", color: "#3b4a6b" },
+      { id: 2, name: "Samsung Galaxy S24 Ultra 512GB", category: "phone", price: 27490000, oldPrice: 31990000, rating: 4.8, sold: 890, icon: "📱", color: "#5a3b6b" },
+      { id: 3, name: "Xiaomi 14T Pro 5G 12GB/512GB", category: "phone", price: 14990000, oldPrice: 17990000, rating: 4.7, sold: 2100, icon: "📱", color: "#2f5545" },
+      { id: 4, name: "MacBook Air M3 13\" 8GB/256GB", category: "laptop", price: 26990000, oldPrice: 28990000, rating: 4.9, sold: 640, icon: "💻", color: "#4a4a55" },
+      { id: 5, name: "ASUS ROG Strix G16 RTX 4070", category: "laptop", price: 45990000, oldPrice: 52990000, rating: 4.8, sold: 320, icon: "💻", color: "#1f3a5f" },
+      { id: 6, name: "Lenovo ThinkPad X1 Carbon Gen 12", category: "laptop", price: 38990000, oldPrice: null, rating: 4.7, sold: 150, icon: "💻", color: "#33383d" },
+      { id: 7, name: "iPad Pro M4 11\" WiFi 256GB", category: "tablet", price: 27990000, oldPrice: 30990000, rating: 4.9, sold: 430, icon: "📲", color: "#44465e" },
+      { id: 8, name: "Samsung Galaxy Tab S9 FE+", category: "tablet", price: 11990000, oldPrice: 13990000, rating: 4.6, sold: 780, icon: "📲", color: "#2d4a3e" },
+      { id: 9, name: "PC Gaming Ryzen 7 / RTX 4060 / 32GB", category: "pc", price: 24990000, oldPrice: 27990000, rating: 4.8, sold: 210, icon: "🖥️", color: "#3a2f52" },
+      { id: 10, name: "iMac 24\" M3 8GB/256GB", category: "pc", price: 33990000, oldPrice: null, rating: 4.8, sold: 95, icon: "🖥️", color: "#4d5b70" },
+      { id: 11, name: "PC Đồ họa Core i9 / RTX 4070 Ti", category: "pc", price: 58990000, oldPrice: 64990000, rating: 4.9, sold: 60, icon: "🖥️", color: "#503048" },
+      { id: 12, name: "Bàn phím cơ AKKO 5075B Plus", category: "gear", price: 1690000, oldPrice: 2190000, rating: 4.7, sold: 3400, icon: "⌨️", color: "#3d3560" },
+      { id: 13, name: "Chuột Logitech G Pro X Superlight 2", category: "gear", price: 2890000, oldPrice: 3490000, rating: 4.9, sold: 1800, icon: "🖱️", color: "#25384a" },
+      { id: 14, name: "Tai nghe HyperX Cloud III", category: "gear", price: 2390000, oldPrice: 2990000, rating: 4.8, sold: 2600, icon: "🎮", color: "#46303a" },
+      { id: 15, name: "Màn hình LG UltraGear 27\" 240Hz", category: "gear", price: 7890000, oldPrice: 9490000, rating: 4.8, sold: 520, icon: "🖲️", color: "#2c4038" },
+      { id: 16, name: "AirPods Pro 2 (USB-C)", category: "accessory", price: 5390000, oldPrice: 6290000, rating: 4.9, sold: 4100, icon: "🎧", color: "#374151" },
+      { id: 17, name: "Sạc nhanh Anker 65W GaN 3 cổng", category: "accessory", price: 1090000, oldPrice: 1390000, rating: 4.8, sold: 5300, icon: "🔌", color: "#4a3b2a" },
+      { id: 18, name: "Ổ cứng SSD Samsung 990 PRO 1TB", category: "accessory", price: 3290000, oldPrice: 4190000, rating: 4.9, sold: 2900, icon: "💾", color: "#2a3f52" }
+    ];
+    const API="http://localhost:5000";
+    let products = (()=>{ try{ const s=localStorage.getItem("izumitech-products"); return s?JSON.parse(s):DEFAULT_PRODUCTS }catch{ return DEFAULT_PRODUCTS }})();
+    function save(){ localStorage.setItem("izumitech-products", JSON.stringify(products)); }
+    async function loadFromAPI(){
+      try{
+        const r=await fetch(`${API}/api/products`);
+        if(!r.ok) throw new Error();
+        const data=await r.json();
+        if(Array.isArray(data) && data.length){ products=data.map(p=>({...p,id:p._id||p.id})); save(); renderStats(); renderTable(); console.log("✅ Admin: đã đồng bộ từ MongoDB"); }
+      }catch(e){ console.log("Admin: API chưa chạy, dùng local"); }
+    }
+    const vnd=n=> new Intl.NumberFormat("vi-VN").format(n)+"₫";
+    let toastT;
+    function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),2200); }
+
+    function renderStats(){
+      const total = products.length;
+      const catCount = new Set(products.map(p=>p.category)).size;
+      const sold = products.reduce((s,p)=>s+p.sold,0);
+      const out = products.filter(p=>(p.stock??0)===0).length;
+      const low = products.filter(p=> (p.stock??0)>0 && p.stock<5).length;
+      const stockSum = products.reduce((s,p)=>s+(p.stock??0),0);
+      $("#stats").innerHTML = `
+        <div class="admin-stat"><small>Tổng sản phẩm</small><b>${total}</b></div>
+        <div class="admin-stat"><small>Còn hàng / Hết hàng</small><b>${total-out} / <span style="color:var(--danger)">${out}</span></b><small>Sắp hết: ${low} • Tổng tồn: ${stockSum}</small></div>
+        <div class="admin-stat"><small>Đã bán</small><b>${sold.toLocaleString("vi-VN")}</b></div>
+        <div class="admin-stat"><small>Tồn kho</small><b>${stockSum}</b><small>SP sắp hết &lt;5: ${low}</small></div>`;
+      renderBestChart();
+    }
+    let filterQ="";
+    let stockFilter="all";
+    function getFilteredList(){
+      let list = products;
+      if(filterQ.trim()){ const q=filterQ.toLowerCase().trim(); list=list.filter(p=>p.name.toLowerCase().includes(q)); }
+      if(stockFilter==="in") list=list.filter(p=>(p.stock??0)>0);
+      else if(stockFilter==="out") list=list.filter(p=>(p.stock??0)===0);
+      else if(stockFilter==="low") list=list.filter(p=> (p.stock??0)>0 && p.stock<5);
+      return list;
+    }
+    function renderBestChart(){
+      const box=$("#bestChart");
+      if(!box) return;
+      const top=[...products].sort((a,b)=>b.sold-a.sold).slice(0,5);
+      const max=top[0]?.sold||1;
+      box.innerHTML = `<b style="font-size:0.9rem">🔥 Bán chạy nhất</b>` + top.map(p=>`
+        <div class="chart-row">
+          <span class="chart-label">${p.icon} ${p.name.slice(0,22)}</span>
+          <div class="chart-bar-bg"><div class="chart-bar" style="width:${Math.round(p.sold/max*100)}%"></div></div>
+          <span class="chart-val">${p.sold.toLocaleString("vi-VN")} đã bán</span>
+        </div>`).join("");
+    }
+    function renderTable(){
+      const list = getFilteredList();
+      const tbody=$("#adTbody");
+      $("#adEmpty").classList.toggle("hidden", list.length>0);
+      tbody.innerHTML = list.map(p=>{
+        const stock = p.stock??0;
+        const stockHtml = stock===0 ? `<span style="color:#fff;background:var(--danger);padding:3px 8px;border-radius:999px;font-size:0.76rem;font-weight:700">Hết hàng</span>` : (stock<5 ? `<span style="background:var(--warning);color:#000;padding:3px 8px;border-radius:999px;font-size:0.76rem;font-weight:700">Sắp hết (${stock})</span>` : `<span style="background:rgba(0,229,195,0.12);color:var(--accent);padding:3px 8px;border-radius:999px;font-size:0.76rem;font-weight:700">Còn ${stock}</span>`);
+        return `
+        <tr>
+          <td>${p.image ? `<img src="${p.image}" alt="" style="width:42px;height:42px;object-fit:cover;border-radius:8px;border:1px solid var(--border)" />` : `<div class="admin-icon" style="background:${p.color}">${p.icon}</div>`}</td>
+          <td><b>${p.name}</b></td>
+          <td>${CATS[p.category]||p.category}</td>
+          <td style="color:var(--accent);font-weight:700">${vnd(p.price)}</td>
+          <td>${stockHtml}</td>
+          <td>${p.sold.toLocaleString("vi-VN")}</td>
+          <td>★ ${p.rating}</td>
+          <td><div class="admin-actions"><button data-edit="${p.id}">Sửa</button><button class="danger" data-del="${p.id}">Xóa</button></div></td>
+        </tr>`}).join("");
+    }
+
+    let pendingImage = "";
+    function setPreview(src){
+      const img=$("#fPreview");
+      if(src){ img.src=src; img.style.display="block"; } else { img.style.display="none"; img.removeAttribute("src"); }
+    }
+    function openForm(p){
+      pendingImage="";
+      $("#adForm").classList.remove("hidden");
+      if(p){
+        $("#fId").value=p.id; $("#fName").value=p.name; $("#fCat").value=p.category; $("#fPrice").value=p.price;
+        $("#fOldPrice").value=p.oldPrice||""; $("#fRating").value=p.rating; $("#fSold").value=p.sold; $("#fStock").value=p.stock??0;
+        $("#fIcon").value=p.icon; $("#fColor").value=p.color;
+        $("#fImage").value=""; $("#fImageUrl").value=p.image||"";
+        try{ $("#fSpecs").value = p.specs ? JSON.stringify(p.specs, null, 2) : ""; }catch{ $("#fSpecs").value=""; }
+        setPreview(p.image||"");
+      } else {
+        $("#adForm").reset(); $("#fId").value=""; $("#fIcon").value="📦"; $("#fColor").value="#3b4a6b"; $("#fRating").value=4.8; $("#fSold").value=0; $("#fStock").value=10;
+        $("#fImageUrl").value=""; $("#fSpecs").value=""; setPreview("");
+      }
+      $("#fName").focus();
+    }
+    function closeForm(){ pendingImage=""; $("#adForm").classList.add("hidden"); $("#adForm").reset(); setPreview(""); }
+    $("#fImage").addEventListener("change", e=>{
+      const f=e.target.files[0];
+      if(!f) return;
+      if(f.size>4*1024*1024){ toast("Ảnh quá lớn, chọn ảnh <4MB nhé!"); e.target.value=""; return; }
+      const r=new FileReader();
+      r.onload=()=>{ pendingImage=r.result; setPreview(pendingImage); };
+      r.readAsDataURL(f);
+    });
+    $("#fImageUrl").addEventListener("input", e=>{
+      const v=e.target.value.trim();
+      if(v && !pendingImage) setPreview(v);
+      else if(!v && !pendingImage) setPreview("");
+    });
+
+    $("#btnAdd").addEventListener("click", ()=> openForm(null));
+    $("#btnCancel").addEventListener("click", closeForm);
+    $("#adSearch").addEventListener("input", e=>{ filterQ=e.target.value; renderTable(); });
+    document.querySelectorAll("#stockFilter [data-stock]").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        document.querySelectorAll("#stockFilter [data-stock]").forEach(x=>x.classList.remove("active"));
+        b.classList.add("active");
+        stockFilter=b.dataset.stock;
+        renderTable();
+      });
+    });
+    $("#adForm").addEventListener("submit", async e=>{
+      e.preventDefault();
+      const rawId = $("#fId").value;
+      const isEdit = !!rawId;
+      const imgVal = pendingImage || $("#fImageUrl").value.trim() || "";
+      let specsObj={};
+      try{ const txt=$("#fSpecs").value.trim(); if(txt) specsObj=JSON.parse(txt); }catch{ toast("JSON thông số không hợp lệ, kiểm tra lại!"); return; }
+      const payload = {
+        name: $("#fName").value.trim(),
+        category: $("#fCat").value,
+        price: Number($("#fPrice").value),
+        oldPrice: $("#fOldPrice").value ? Number($("#fOldPrice").value) : null,
+        rating: Number($("#fRating").value),
+        sold: Number($("#fSold").value),
+        stock: Number($("#fStock").value),
+        icon: $("#fIcon").value.trim() || "📦",
+        color: $("#fColor").value.trim() || "#3b4a6b",
+        image: imgVal,
+        specs: specsObj
+      };
+      try{
+        let res;
+        if(isEdit){
+          const isMongo = String(rawId).length===24;
+          res = await fetch(`${API}/api/products/${rawId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+          if(res.ok){ const upd=await res.json(); const obj={...upd,id:upd._id}; const idx=products.findIndex(p=>String(p.id)===String(rawId)); if(idx>=0) products[idx]=obj; else products.unshift(obj); save(); renderStats(); renderTable(); closeForm(); toast("Đã cập nhật (MongoDB) ✅"); return; }
+        } else {
+          res = await fetch(`${API}/api/products`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+          if(res.ok){ const created=await res.json(); const obj={...created,id:created._id}; products.unshift(obj); save(); renderStats(); renderTable(); closeForm(); toast("Đã thêm (MongoDB) 🎉"); return; }
+        }
+        throw new Error("API fail");
+      }catch{
+        const id = rawId ? Number(rawId) : Date.now();
+        const obj = { id, ...payload };
+        const idx = products.findIndex(p=>String(p.id)===String(id));
+        if(idx>=0) products[idx]=obj; else products.unshift(obj);
+        save(); renderStats(); renderTable(); closeForm();
+        toast(isEdit ? "Đã cập nhật (local) ✅" : "Đã thêm (local) 🎉");
+      }
+    });
+    document.addEventListener("click", async e=>{
+      const ed = e.target.closest("[data-edit]");
+      if(ed){ const p=products.find(x=>String(x.id)===String(ed.dataset.edit)); if(p) openForm(p); return; }
+      const del = e.target.closest("[data-del]");
+      if(del){
+        if(!confirm("Xóa sản phẩm này?")) return;
+        const delId = del.dataset.del;
+        try{
+          const r=await fetch(`${API}/api/products/${delId}`,{method:"DELETE"});
+          if(r.ok){ products=products.filter(p=>String(p.id)!==String(delId)); save(); renderStats(); renderTable(); toast("Đã xóa (MongoDB) 🗑️"); return; }
+        }catch{}
+        products = products.filter(p=>String(p.id)!==String(delId));
+        save(); renderStats(); renderTable(); toast("Đã xóa (local) 🗑️");
+      }
+    });
+    document.querySelectorAll(".admin-nav-btn[data-tab]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".admin-nav-btn[data-tab]").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab=btn.dataset.tab;
+        ["products","orders","users","settings"].forEach(t=>{
+          document.getElementById("tab-"+t).classList.toggle("hidden", t!==tab);
+        });
+        if(tab==="orders") renderOrders();
+        if(tab==="users") renderUsers();
+      });
+    });
+    function renderOrders(){
+      try{
+        const cart = JSON.parse(localStorage.getItem("izumitech-cart")||"{}");
+        const entries = Object.entries(cart);
+        if(!entries.length){ $("#ordersBox").innerHTML='<p class="admin-empty">Chưa có đơn nào (giỏ hàng trống)</p>'; return; }
+        let html='<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Sản phẩm</th><th>SL</th><th>Giá</th></tr></thead><tbody>';
+        const prods = (()=>{ try{return JSON.parse(localStorage.getItem("izumitech-products"))||"null"}catch{return null}})() || DEFAULT_PRODUCTS;
+        entries.forEach(([id,q])=>{
+          const p=prods.find(x=>x.id==id);
+          if(!p) return;
+          html+=`<tr><td>${p.icon} ${p.name}</td><td>${q.qty||q}</td><td>${vnd(p.price*(q.qty||q))}</td></tr>`;
+        });
+        html+='</tbody></table></div>';
+        $("#ordersBox").innerHTML=html;
+      }catch{ $("#ordersBox").innerHTML='<p class="admin-empty">Lỗi đọc dữ liệu</p>'; }
+    }
+    async function renderUsers(){
+      try{
+        const r=await fetch(`${API}/api/users`);
+        if(r.ok){
+          const list=await r.json();
+          if(!list.length){ $("#usersBox").innerHTML='<p class="admin-empty">Chưa có khách hàng</p>'; return; }
+          $("#usersBox").innerHTML = `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Tên</th><th>Email</th><th>Role</th><th>Ngày tạo</th></tr></thead><tbody>` + list.map(u=>`<tr><td><b>${u.name}</b></td><td>${u.email}</td><td>${u.role}</td><td>${new Date(u.createdAt).toLocaleDateString("vi-VN")}</td></tr>`).join("") + `</tbody></table></div>`;
+          return;
+        }
+      }catch{}
+      const u = JSON.parse(localStorage.getItem("izumitech-user")||"null");
+      if(!u){ $("#usersBox").innerHTML='<p class="admin-empty">Chưa có khách hàng đăng nhập trên trình duyệt này</p>'; return; }
+      $("#usersBox").innerHTML=`<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)"><span style="width:44px;height:44px;border-radius:50%;background:var(--primary);display:grid;place-items:center;color:#fff;font-weight:800">${u.name[0].toUpperCase()}</span><div><b>${u.name}</b><br><small style="color:var(--muted)">${u.email}</small></div></div>`;
+    }
+    $("#btnReset").addEventListener("click", async ()=>{
+      if(!confirm("Khôi phục 18 sản phẩm mặc định? Dữ liệu chỉnh sửa sẽ mất.")) return;
+      try{
+        const r=await fetch(`${API}/api/products`);
+        if(r.ok){
+          const list=await r.json();
+          for(const p of list){ try{ await fetch(`${API}/api/products/${p._id}`,{method:"DELETE"});}catch{} }
+        }
+        for(const p of DEFAULT_PRODUCTS){ await fetch(`${API}/api/products`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}); }
+        toast("Đã khôi phục trên MongoDB ♻️");
+      }catch{}
+      localStorage.removeItem("izumitech-products");
+      products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      save(); renderStats(); renderTable();
+    });
+
+    renderStats(); renderTable(); loadFromAPI();
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IzumiTech — Cửa hàng đồ điện tử</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">⚡</span>
+        <div class="logo-col">
+          <span class="logo-text">Izumi<span>Tech</span></span>
+          <small class="slogan">Công nghệ xịn — Giá cực yêu</small>
+        </div>
+      </a>
+
+      <div class="cat-dropdown">
+        <button class="cat-toggle" id="catToggle" aria-expanded="false" aria-haspopup="true">☰ Danh mục</button>
+        <div class="cat-menu hidden" id="catMenu"></div>
+      </div>
+      <span class="active-cat" id="activeCat">Tất cả sản phẩm</span>
+
+      <div class="header-actions">
+        <div class="search-wrap">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm điện thoại, laptop..." autocomplete="off" />
+            <button aria-label="Tìm kiếm">🔍</button>
+          </div>
+          <div class="search-suggest hidden" id="searchSuggest"></div>
+        </div>
+        <a href="tel:19006868" class="hotline">
+          <span class="hotline-icon">📞</span>
+          <span class="hotline-text"><small>Hotline 24/7</small><b>1900 6868</b></span>
+        </a>
+        <div class="auth" id="authBox">
+          <a href="login.html" class="auth-btn" id="loginBtn">Đăng nhập</a>
+          <a href="signup.html" class="auth-btn primary" id="signupBtn">Đăng ký</a>
+          <div class="user-menu hidden" id="userMenu">
+            <span class="user-name" id="userName"></span>
+            <button class="auth-btn ghost" id="logoutBtn">Đăng xuất</button>
+          </div>
+        </div>
+        <button class="cart-btn" id="cartBtn" aria-label="Giỏ hàng">
+          🛒<span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <p class="hero-tag">🔥 Khuyến mãi tháng 8</p>
+          <h1><small id="heroGreet"></small>Công nghệ <span>xịn sò</span><br />giá cực tốt</h1>
+          <p class="hero-sub">Điện thoại, laptop, tablet, PC, gear gaming và phụ kiện chính hãng — giảm đến 50%, trả góp 0%.</p>
+          <a href="#products" class="btn btn-primary">Mua ngay</a>
+          <a href="#products" class="btn btn-ghost">Xem khuyến mãi</a>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-blob"></div>
+          <div class="hero-emoji e1">📱</div>
+          <div class="hero-emoji e2">💻</div>
+          <div class="hero-emoji e3">🎧</div>
+          <div class="hero-emoji e4">🖥️</div>
+          <div class="hero-emoji e5">🎮</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features container">
+      <div class="feature"><span>🚚</span><div><b>Giao nhanh 2h</b><small>Nội thành HN &amp; HCM</small></div></div>
+      <div class="feature"><span>🛡️</span><div><b>Bảo hành 12 tháng</b><small>Chính hãng toàn quốc</small></div></div>
+      <div class="feature"><span>💳</span><div><b>Trả góp 0%</b><small>Quẹt thẻ / duyệt online</small></div></div>
+      <div class="feature"><span>↩️</span><div><b>Đổi mới 30 ngày</b><small>Lỗi là đổi, không sửa chữa</small></div></div>
+    </section>
+
+    <section class="products container" id="products">
+      <div class="section-head">
+        <div>
+          <h2>Khám phá theo danh mục</h2>
+          <div class="active-filters" id="activeFilters"></div>
+        </div>
+        <div class="sort-box">
+          <label for="sortSelect">Sắp xếp:</label>
+          <select id="sortSelect">
+            <option value="popular">Phổ biến nhất</option>
+            <option value="price-asc">Giá thấp → cao</option>
+            <option value="price-desc">Giá cao → thấp</option>
+            <option value="rating">Đánh giá cao</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="homeSections"></div>
+      <div id="singleGridWrap" class="hidden">
+        <div class="product-grid" id="productGrid"></div>
+        <p class="empty-msg hidden" id="emptyMsg">Không tìm thấy sản phẩm nào 😢</p>
+      </div>
+    </section>
+
+    <section class="social-proof container">
+      <div class="stat"><b>50.000+</b><span>khách hàng tin dùng</span></div>
+      <div class="stat"><b>12.000+</b><span>đơn giao mỗi tháng</span></div>
+      <div class="stat"><b>4.9/5</b><span>điểm hài lòng</span></div>
+      <div class="stat"><b>8 năm</b><span>đồng hành cùng bạn</span></div>
+    </section>
+
+    <section class="testimonials container">
+      <h2>Khách hàng nói gì về chúng mình? 💬</h2>
+      <div class="testimonial-grid">
+        <figure class="t-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"Đặt sáng nay, 11h là shipper tới nơi. Máy nguyên seal, được tặng thêm dán màn hình nữa. 10 điểm không có nhưng!"</blockquote>
+          <figcaption><span class="avatar">👩</span><div><b>Thu Hà</b><small>Nhân viên văn phòng · Hà Nội</small></div></figcaption>
+        </figure>
+        <figure class="t-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"Mình là người khó tính lắm mà được anh tư vấn kiên nhẫn chọn laptop gần 1 tiếng, không chèo kéo mua đắt. Quý thật sự."</blockquote>
+          <figcaption><span class="avatar">🧑‍💻</span><div><b>Quang Duy</b><small>Sinh viên IT · TP.HCM</small></div></figcaption>
+        </figure>
+        <figure class="t-card">
+          <div class="stars">★★★★☆</div>
+          <blockquote>"Trả góp 0% duyệt nhanh gọn lẹ. Bảo hành có tâm, máy bị lỗi pin đổi mới luôn trong 3 ngày. Sẽ ủng hộ tiếp!"</blockquote>
+          <figcaption><span class="avatar">👨‍🔧</span><div><b>Minh Tuấn</b><small>Kỹ sư xây dựng · Đà Nẵng</small></div></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="promise container">
+      <div class="promise-card">
+        <span class="promise-emoji">🤝</span>
+        <div>
+          <h3>Cam kết từ IzumiTech</h3>
+          <p>Máy bán ra là máy mình đang dùng — từng sản phẩm đều được anh em kỹ thuật test tay 100% trước khi đóng gói. Có vấn đề gì, gọi <b>1900 6868</b>, người thật trả lời, không bot nghe máy.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="logo"><span class="logo-icon">⚡</span><span class="logo-text">Izumi<span>Tech</span></span></div>
+        <p class="muted">Cửa hàng đồ điện tử chính hãng. Điện thoại – Laptop – Tablet – PC – Gear – Phụ kiện.</p>
+      </div>
+      <div>
+        <h4>Về IzumiTech</h4>
+        <ul><li><a href="#">Giới thiệu</a></li><li><a href="#">Tuyển dụng</a></li><li><a href="#">Hệ thống cửa hàng</a></li></ul>
+      </div>
+      <div>
+        <h4>Hỗ trợ</h4>
+        <ul><li><a href="#">Hotline: 1900 6868</a></li><li><a href="#">Chính sách bảo hành</a></li><li><a href="#">Trả góp &amp; công nợ</a></li></ul>
+      </div>
+      <div>
+        <h4>Kết nối</h4>
+        <ul><li><a href="#">Facebook</a></li><li><a href="#">YouTube</a></li><li><a href="#">TikTok</a></li><li><a href="admin.html" style="color:var(--accent)">⚙️ Admin</a></li></ul>
+      </div>
+    </div>
+    <div class="container newsletter">
+      <div>
+        <h4>📩 Đừng bỏ lỡ deal hời!</h4>
+        <p class="muted">Đăng ký để nhận mã giảm giá 200K cho đơn đầu tiên — chỉ gửi tin hay, không spam.</p>
+      </div>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" id="newsletterEmail" placeholder="Email của bạn..." required />
+        <button class="btn btn-primary" type="submit">Nhận ưu đãi</button>
+      </form>
+    </div>
+    <p class="copyright">© 2026 IzumiTech — Thiết kế bởi Izumi 💙</p>
+  </footer>
+
+  <button class="chat-fab" id="chatFab" aria-label="Chat tư vấn">
+    💬
+    <span class="chat-dot"></span>
+  </button>
+
+  <div class="chat-box hidden" id="chatBox" aria-hidden="true">
+    <div class="chat-head">
+      <span class="chat-avatar">🧑‍💼</span>
+      <div>
+        <b>Tư vấn IzumiTech</b>
+        <small><span class="online-dot"></span>Đang online — trả lời trong vài phút</small>
+      </div>
+      <button class="icon-btn" id="chatClose" aria-label="Đóng chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <form class="chat-input-row" id="chatForm">
+      <input type="text" id="chatInput" placeholder="Nhập câu hỏi của bạn..." autocomplete="off" />
+      <button type="submit" aria-label="Gửi">➤</button>
+    </form>
+  </div>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <div class="cart-head">
+      <h3>🛒 Giỏ hàng</h3>
+      <button class="icon-btn" id="closeCart" aria-label="Đóng">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total-row"><span>Tạm tính</span><b id="cartTotal">0₫</b></div>
+      <button class="btn btn-primary btn-block" id="checkoutBtn">Thanh toán</button>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="auth-overlay hidden" id="authOverlay"></div>
+  <div class="auth-modal hidden" id="authModal" aria-hidden="true">
+    <button class="icon-btn auth-close" id="closeAuth" aria-label="Đóng">✕</button>
+    <h3 id="authTitle">Đăng nhập</h3>
+    <p class="muted" id="authDesc">Chào mừng trở lại!</p>
+    <form id="authForm">
+      <input type="text" id="authName" placeholder="Họ tên" />
+      <input type="email" id="authEmail" placeholder="Email *" required />
+      <input type="password" id="authPass" placeholder="Mật khẩu *" required />
+      <button type="submit" class="btn btn-primary btn-block" id="authSubmit">Đăng nhập</button>
+    </form>
+    <p class="auth-switch" id="authSwitch"></p>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

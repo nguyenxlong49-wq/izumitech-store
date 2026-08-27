@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng ký — IzumiTech</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⚡</span>
+        <div class="logo-col">
+          <span class="logo-text">Izumi<span>Tech</span></span>
+          <small class="slogan">Công nghệ xịn — Giá cực yêu</small>
+        </div>
+      </a>
+      <div class="header-actions" style="margin-left:auto">
+        <a href="tel:19006868" class="hotline">
+          <span class="hotline-icon">📞</span>
+          <span class="hotline-text"><small>Hotline 24/7</small><b>1900 6868</b></span>
+        </a>
+        <a href="login.html" class="auth-btn">Đăng nhập</a>
+        <a href="signup.html" class="auth-btn primary">Đăng ký</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-page container">
+    <div class="auth-card">
+      <div class="auth-card-top">
+        <h1>Tạo tài khoản 🎉</h1>
+        <p>Nhận mã <b>IZUMI200</b> giảm 200K cho đơn đầu tiên</p>
+      </div>
+      <form id="signupForm">
+        <div>
+          <label for="suName">Họ tên</label>
+          <input type="text" id="suName" placeholder="Nguyễn Văn A" required />
+        </div>
+        <div>
+          <label for="suEmail">Email</label>
+          <input type="email" id="suEmail" placeholder="you@example.com" required />
+        </div>
+        <div>
+          <label for="suPass">Mật khẩu</label>
+          <input type="password" id="suPass" placeholder="Tối thiểu 6 ký tự" required />
+        </div>
+        <div>
+          <label for="suPass2">Xác nhận mật khẩu</label>
+          <input type="password" id="suPass2" placeholder="Nhập lại mật khẩu" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Tạo tài khoản</button>
+      </form>
+      <div class="auth-divider">hoặc</div>
+      <p class="auth-switch">Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script>
+    const API="http://localhost:5000";
+    const $ = s => document.querySelector(s);
+    let t;
+    function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("show"); clearTimeout(t); t=setTimeout(()=>el.classList.remove("show"),2200); }
+    $("#signupForm").addEventListener("submit", async e=>{
+      e.preventDefault();
+      const name=$("#suName").value.trim();
+      const email=$("#suEmail").value.trim();
+      const pass=$("#suPass").value;
+      const pass2=$("#suPass2").value;
+      if(!name||!email||!pass) return;
+      if(pass.length<6){ toast("Mật khẩu ít nhất 6 ký tự nhé!"); return; }
+      if(pass!==pass2){ toast("Mật khẩu xác nhận không khớp 😢"); return; }
+      const btn = e.target.querySelector("button[type=submit]");
+      btn.disabled=true; btn.textContent="Đang tạo...";
+      try{
+        const res = await fetch(`${API}/api/auth/signup`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,email,password:pass})});
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.msg||"Đăng ký thất bại");
+        localStorage.setItem("izumitech-user", JSON.stringify(data.user));
+        localStorage.setItem("izumitech-token", data.token);
+        toast(`Tạo tài khoản thành công! Chào ${name} 🎉`);
+        setTimeout(()=> location.href="index.html", 900);
+      }catch(err){
+        toast(err.message);
+        btn.disabled=false; btn.textContent="Tạo tài khoản";
+      }
+    });
+  </script>
+</body>
+</html>
