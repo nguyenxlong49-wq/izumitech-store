@@ -37,7 +37,7 @@
   <div class="overlay" id="overlay"></div>
 
   <script>
-    const API="http://localhost:5000";
+    const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://localhost:5000":"https://izumitech-api.onrender.com";
     const $=s=>document.querySelector(s);
     const vnd=n=> new Intl.NumberFormat("vi-VN").format(n)+"₫";
     const params=new URLSearchParams(location.search);

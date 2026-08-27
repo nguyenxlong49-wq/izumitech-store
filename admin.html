@@ -154,7 +154,7 @@
       { id: 17, name: "Sạc nhanh Anker 65W GaN 3 cổng", category: "accessory", price: 1090000, oldPrice: 1390000, rating: 4.8, sold: 5300, icon: "🔌", color: "#4a3b2a" },
       { id: 18, name: "Ổ cứng SSD Samsung 990 PRO 1TB", category: "accessory", price: 3290000, oldPrice: 4190000, rating: 4.9, sold: 2900, icon: "💾", color: "#2a3f52" }
     ];
-    const API="http://localhost:5000";
+    const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://localhost:5000":"https://izumitech-api.onrender.com";
     let products = (()=>{ try{ const s=localStorage.getItem("izumitech-products"); return s?JSON.parse(s):DEFAULT_PRODUCTS }catch{ return DEFAULT_PRODUCTS }})();
     function save(){ localStorage.setItem("izumitech-products", JSON.stringify(products)); }
     async function loadFromAPI(){

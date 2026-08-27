@@ -48,7 +48,7 @@ const DEFAULT_PRODUCTS = [
   { id: 17, name: "Sạc nhanh Anker 65W GaN 3 cổng", category: "accessory", price: 1090000, oldPrice: 1390000, rating: 4.8, sold: 5300, stock: 2, icon: "🔌", color: "#4a3b2a", specs: { "Công suất": "65W GaNPrime", "Cổng": "2x USB-C + 1x USB-A", "Sạc": "PD 3.0, PPS, PowerIQ 4.0", "Pin": "Không", "Loa": "Không", "Bảo vệ": "ActiveShield 2.0, quá nhiệt/quá áp" } },
   { id: 18, name: "Ổ cứng SSD Samsung 990 PRO 1TB", category: "accessory", price: 3290000, oldPrice: 4190000, rating: 4.9, sold: 2900, stock: 0, icon: "💾", color: "#2a3f52", specs: { "Dung lượng": "1TB", "Chuẩn": "NVMe PCIe 4.0 x4", "Tốc độ": "7450/6900 MB/s", "Loa": "Không", "Pin": "Không", "Tuổi thọ": "600 TBW, 5 năm BH" } }
 ];
-const API_BASE = "http://localhost:5000";
+const API_BASE = (location.hostname==="localhost"||location.hostname==="127.0.0.1") ? "http://localhost:5000" : "https://izumitech-api.onrender.com";
 let PRODUCTS = (() => {
   try { const s = localStorage.getItem("izumitech-products"); return s ? JSON.parse(s) : DEFAULT_PRODUCTS; } catch { return DEFAULT_PRODUCTS; }
 })();

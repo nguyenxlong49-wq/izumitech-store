@@ -59,7 +59,7 @@
 
   <div class="toast" id="toast"></div>
   <script>
-    const API="http://localhost:5000";
+    const API=(location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://localhost:5000":"https://izumitech-api.onrender.com";
     const $ = s => document.querySelector(s);
     let t;
     function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("show"); clearTimeout(t); t=setTimeout(()=>el.classList.remove("show"),2200); }
