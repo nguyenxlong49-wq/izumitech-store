@@ -150,15 +150,16 @@
 
     function doBuy(isNow){
       if(product.stock===0){ toast("Sản phẩm đã hết hàng 😢"); return; }
+      if(isNow){
+        location.href=`checkout.html?id=${product.id}&qty=1`;
+        return;
+      }
       const cart=JSON.parse(localStorage.getItem("izumitech-cart")||"{}");
       const key=String(product.id);
       cart[key]= cart[key] ? {qty:cart[key].qty+1} : {qty:1};
       localStorage.setItem("izumitech-cart",JSON.stringify(cart));
       updateCartUI();
-      if(isNow){
-        toast(`Đã thêm "${product.name}" — đang chuyển tới giỏ hàng...`);
-        setTimeout(()=> document.getElementById("cartDrawer")?.classList.add("open"),300);
-      } else toast(`Đã thêm "${product.name}" vào giỏ 🛒`);
+      toast(`Đã thêm "${product.name}" vào giỏ 🛒`);
     }
 
     function getComments(){
@@ -225,15 +226,7 @@
     $("#checkoutBtn")?.addEventListener("click",()=>{
       const cart=JSON.parse(localStorage.getItem("izumitech-cart")||"{}");
       if(!Object.keys(cart).length){ toast("Giỏ hàng trống 🙂"); return; }
-      const total=Object.entries(cart).reduce((s,[pid,q])=>{ const p=allProducts.find(x=>String(x.id)===String(pid)); return p?s+p.price*(q.qty||0):s; },0);
-      const orders=JSON.parse(localStorage.getItem("izumitech-orders")||"[]");
-      const user=JSON.parse(localStorage.getItem("izumitech-user")||"null")||{name:"Khách",email:"guest@izumitech.vn"};
-      orders.unshift({customerName:user.name,customerEmail:user.email,items:Object.entries(cart).map(([pid,q])=>{const p=allProducts.find(x=>String(x.id)===String(pid));return {product:pid,name:p?.name,price:p?.price,qty:q.qty}}),total,date:new Date().toISOString()});
-      localStorage.setItem("izumitech-orders",JSON.stringify(orders));
-      localStorage.setItem("izumitech-cart","{}");
-      updateCartUI();
-      toast(`Đặt hàng thành công! ${vnd(total)} 💙`);
-      $("#cartDrawer").classList.remove("open");
+      location.href="checkout.html";
     });
 
     load();

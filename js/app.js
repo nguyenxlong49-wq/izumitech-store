@@ -468,29 +468,12 @@ $("#cartBtn").addEventListener("click", () => openCart(true));
 $("#closeCart").addEventListener("click", () => openCart(false));
 $("#overlay").addEventListener("click", () => openCart(false));
 
-$("#checkoutBtn").addEventListener("click", async () => {
+$("#checkoutBtn").addEventListener("click", () => {
   if (!cartCount()) {
     showToast("Giỏ hàng đang trống, thêm sản phẩm trước nhé! 🙂");
     return;
   }
-  const total = cartTotal();
-  const items = Object.entries(state.cart).map(([id, it])=>{
-    const p=PRODUCTS.find(x=>String(x.id)===String(id));
-    return p?{ product: p._id||p.id, name:p.name, price:p.price, qty:it.qty }:null;
-  }).filter(Boolean);
-  const customer = state.user || { name: "Khách vãng lai", email: "guest@izumitech.vn" };
-  const order = { customerName: customer.name, customerEmail: customer.email, phone: customer.phone||"", items, total, status:"pending", date: new Date().toISOString() };
-  const orders = JSON.parse(localStorage.getItem("izumitech-orders")||"[]");
-  orders.unshift(order);
-  localStorage.setItem("izumitech-orders", JSON.stringify(orders));
-  try{
-    await fetch(`${API_BASE}/api/orders`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ customerName: order.customerName, customerEmail: order.customerEmail, phone: order.phone, items: items.map(i=>({product:i.product,name:i.name,price:i.price,qty:i.qty})), total })});
-  }catch{}
-  showToast(`Đặt hàng thành công! Tổng tiền: ${vnd(total)} 💙 (+${Math.floor(total/10000)} điểm)`);
-  state.cart = {};
-  saveCart();
-  updateCartUI();
-  openCart(false);
+  location.href="checkout.html";
 });
 
 function updateGreeting() {
