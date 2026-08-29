@@ -78,6 +78,17 @@
     </div>
   </main>
 
+  <div class="postcard-overlay hidden" id="postcardOverlay"></div>
+  <div class="postcard hidden" id="loginPostcard" aria-hidden="true">
+    <button class="icon-btn" id="closePostcard" aria-label="Đóng" style="position:absolute;top:12px;right:12px">✕</button>
+    <div style="font-size:2.2rem">🔒</div>
+    <h3 style="margin-top:8px">Chưa đăng nhập</h3>
+    <p class="muted" style="margin-top:6px">Hình như bạn chưa đăng nhập, vui lòng đăng nhập để mua sản phẩm này!</p>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+      <a href="login.html" class="btn btn-primary">Đăng nhập</a>
+      <a href="signup.html" class="btn btn-ghost">Đăng ký</a>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
 
   <style>
@@ -95,6 +106,10 @@
     const $=s=>document.querySelector(s);
     const vnd=n=> new Intl.NumberFormat("vi-VN").format(n)+"₫";
     let tt; function toast(m){ const el=$("#toast"); el.textContent=m; el.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("show"),2600); }
+    function showLoginPostcard(){ document.getElementById("postcardOverlay")?.classList.remove("hidden"); document.getElementById("loginPostcard")?.classList.remove("hidden"); }
+    function hideLoginPostcard(){ document.getElementById("postcardOverlay")?.classList.add("hidden"); document.getElementById("loginPostcard")?.classList.add("hidden"); }
+    document.getElementById("closePostcard")?.addEventListener("click", hideLoginPostcard);
+    document.getElementById("postcardOverlay")?.addEventListener("click", hideLoginPostcard);
 
     const params=new URLSearchParams(location.search);
     const singleId=params.get("id");
@@ -166,6 +181,8 @@
 
     $("#checkoutForm").addEventListener("submit", async e=>{
       e.preventDefault();
+      const userCheck=JSON.parse(localStorage.getItem("izumitech-user")||"null");
+      if(!userCheck){ showLoginPostcard(); return; }
       if(!$("#agree1").checked || !$("#agree2").checked){ toast("Vui lòng tích đủ 2 ô xác nhận điều khoản *"); return; }
       const items=window._checkoutItems;
       if(!items||!items.length){ toast("Giỏ hàng trống"); return; }

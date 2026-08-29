@@ -288,6 +288,10 @@ button { font-family: inherit; cursor: pointer; }
 .auth-modal input:focus { border-color: var(--primary); }
 .auth-switch { text-align: center; margin-top: 14px; font-size: 0.86rem; color: var(--muted); }
 .auth-switch a { color: var(--primary); font-weight: 700; cursor: pointer; }
+.postcard-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(2px); z-index: 130; }
+.postcard-overlay.hidden { display: none; }
+.postcard { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: min(380px,92vw); background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px 24px; text-align: center; box-shadow: var(--shadow); z-index: 135; animation: rise 0.25s ease both; }
+.postcard.hidden { display: none; }
 
 .auth-page {
   min-height: calc(100vh - 70px);

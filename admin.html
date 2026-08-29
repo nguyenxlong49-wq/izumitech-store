@@ -82,6 +82,16 @@
             </div>
           </form>
 
+          <div class="admin-card" style="margin-bottom:14px;padding:14px">
+            <h3>🤖 AI Thêm sản phẩm</h3>
+            <p class="muted" style="font-size:0.84rem">Nhập mô tả, AI sẽ tạo sản phẩm tự động — dùng ChatGPT nếu có key, không thì tạo mẫu ngẫu nhiên.</p>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <input type="text" id="aiPrompt" placeholder="VD: Tạo 3 điện thoại Samsung mới, giá 15-25tr" style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text)" />
+              <button class="btn btn-primary" id="aiGenBtn">AI Tạo</button>
+              <button class="btn btn-ghost" id="aiAutoBtn">AI Thêm 5 mẫu ngẫu nhiên</button>
+            </div>
+            <div id="aiStatus" class="muted" style="margin-top:8px;font-size:0.84rem"></div>
+          </div>
           <div class="stock-filter" id="stockFilter">
             <button data-stock="all" class="active">Tất cả</button>
             <button data-stock="in">Còn hàng</button>
@@ -369,6 +379,67 @@
       if(!u){ $("#usersBox").innerHTML='<p class="admin-empty">Chưa có khách hàng đăng nhập trên trình duyệt này</p>'; return; }
       $("#usersBox").innerHTML=`<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2)"><span style="width:44px;height:44px;border-radius:50%;background:var(--primary);display:grid;place-items:center;color:#fff;font-weight:800">${(u.name?.trim()||"K")[0].toUpperCase()}</span><div><b>${u.name||"Khách"}</b><br><small style="color:var(--muted)">${u.email}</small></div></div>`;
     }
+    function genRandomProducts(n){
+      const cats=["phone","laptop","tablet","pc","gear","accessory"];
+      const icons={phone:"📱",laptop:"💻",tablet:"📲",pc:"🖥️",gear:"🎮",accessory:"🎧"};
+      const colors={phone:"#3b4a6b",laptop:"#1f3a5f",tablet:"#44465e",pc:"#3a2f52",gear:"#3d3560",accessory:"#374151"};
+      const names={phone:["iPhone 16 Pro","Samsung S25","Xiaomi 15","OPPO Find X8"],laptop:["MacBook Pro M4","Dell XPS 15","ASUS ZenBook"],tablet:["iPad Air M3","Galaxy Tab S10"],pc:["PC Gaming i9 RTX 4080","PC Văn phòng i5"],gear:["Bàn phím Keychron","Chuột Razer","Tai nghe Sony"],accessory:["Sạc 100W","Cáp USB-C","Ốp lưng"]};
+      const arr=[];
+      for(let i=0;i<n;i++){
+        const cat=cats[Math.floor(Math.random()*cats.length)];
+        const pool=names[cat]||["Sản phẩm mới"];
+        const base=pool[Math.floor(Math.random()*pool.length)];
+        arr.push({ name: base+" "+(Math.floor(Math.random()*90)+10), category:cat, price: Math.floor(Math.random()*30000000)+1000000, oldPrice: Math.random()>0.5? Math.floor(Math.random()*35000000)+5000000 : null, rating: +(Math.random()*0.8+4.2).toFixed(1), sold: Math.floor(Math.random()*500), stock: Math.floor(Math.random()*30), icon: icons[cat]||"📦", color: colors[cat]||"#3b4a6b", image:"", specs:{} });
+      }
+      return arr;
+    }
+    async function addAIProducts(list){
+      let added=0;
+      for(const p of list){
+        try{
+          const r=await fetch(`${API}/api/products`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+          if(r.ok){ const created=await r.json(); products.unshift({...created,id:created._id}); added++; continue; }
+        }catch{}
+        const obj={...p, id: Date.now()+added};
+        products.unshift(obj); added++;
+      }
+      save(); renderStats(); renderTable();
+      return added;
+    }
+    $("#aiGenBtn")?.addEventListener("click", async ()=>{
+      const prompt=$("#aiPrompt").value.trim();
+      if(!prompt){ toast("Nhập mô tả cho AI nhé!"); return; }
+      $("#aiStatus").textContent="🤖 AI đang tạo sản phẩm...";
+      try{
+        const r=await fetch(`${API}/api/chat`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`Tạo JSON mảng ${3} sản phẩm cho IzumiTech theo yêu cầu: \"${prompt}\". Chỉ trả về JSON thuần, mỗi phần tử gồm name, category (phone/laptop/tablet/pc/gear/accessory), price (number), oldPrice (number hoặc null), rating (3.5-5), stock (0-30), icon (emoji 1 ký tự), color (hex), specs (object với 3-4 cặp key-value tiếng Việt). Không thêm lời giải thích.`, history:[]})});
+        const data=await r.json();
+        const text=data.reply||"";
+        const m=text.match(/\[[\s\S]*\]/);
+        if(m){
+          const arr=JSON.parse(m[0]);
+          if(Array.isArray(arr)&&arr.length){
+            const n=await addAIProducts(arr.slice(0,5));
+            $("#aiStatus").textContent=`✅ AI đã tạo ${n} sản phẩm!`;
+            toast(`AI đã thêm ${n} sản phẩm 🤖`);
+            return;
+          }
+        }
+        throw new Error("parse fail");
+      }catch(e){
+        const arr=genRandomProducts(3);
+        const n=await addAIProducts(arr);
+        $("#aiStatus").textContent=`⚙️ AI offline — đã tạo ${n} sản phẩm mẫu ngẫu nhiên`;
+        toast(`AI offline: đã thêm ${n} sản phẩm mẫu`);
+      }
+    });
+    $("#aiAutoBtn")?.addEventListener("click", async ()=>{
+      $("#aiStatus").textContent="🤖 AI đang tạo 5 sản phẩm ngẫu nhiên...";
+      const arr=genRandomProducts(5);
+      const n=await addAIProducts(arr);
+      $("#aiStatus").textContent=`✅ Đã thêm ${n} sản phẩm ngẫu nhiên`;
+      toast(`Đã thêm ${n} sản phẩm 🤖`);
+    });
+
     $("#btnReset").addEventListener("click", async ()=>{
       if(!confirm("Khôi phục 18 sản phẩm mặc định? Dữ liệu chỉnh sửa sẽ mất.")) return;
       try{

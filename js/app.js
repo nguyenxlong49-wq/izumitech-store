@@ -307,6 +307,16 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
 }
+function showLoginPostcard(){
+  $("#postcardOverlay")?.classList.remove("hidden");
+  $("#loginPostcard")?.classList.remove("hidden");
+  $("#loginPostcard")?.setAttribute("aria-hidden","false");
+}
+function hideLoginPostcard(){
+  $("#postcardOverlay")?.classList.add("hidden");
+  $("#loginPostcard")?.classList.add("hidden");
+  $("#loginPostcard")?.setAttribute("aria-hidden","true");
+}
 
 function openCart(open) {
   $("#cartDrawer").classList.toggle("open", open);
@@ -368,6 +378,7 @@ document.addEventListener("click", (e) => {
 
   const add = e.target.closest("[data-add]");
   if (add) {
+    if (!state.user) { showLoginPostcard(); return; }
     if (add.disabled) { showToast("Sản phẩm đã hết hàng 😢"); return; }
     const pid = add.dataset.add;
     const prod = PRODUCTS.find(p=>String(p.id)===String(pid));
@@ -451,6 +462,7 @@ $("#closeCart").addEventListener("click", () => openCart(false));
 $("#overlay").addEventListener("click", () => openCart(false));
 
 $("#checkoutBtn").addEventListener("click", () => {
+  if (!state.user) { showLoginPostcard(); return; }
   if (!cartCount()) {
     showToast("Giỏ hàng đang trống, thêm sản phẩm trước nhé! 🙂");
     return;
@@ -593,6 +605,8 @@ $("#logoutBtn")?.addEventListener("click", () => {
   showToast("Đã đăng xuất. Hẹn gặp lại! 👋");
 });
 renderAuth();
+$("#closePostcard")?.addEventListener("click", hideLoginPostcard);
+$("#postcardOverlay")?.addEventListener("click", hideLoginPostcard);
 
 renderCategories();
 renderProducts();
